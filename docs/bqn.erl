@@ -10,22 +10,29 @@ block() ->
 
 run(<<>>,S) ->
     S;
-run(<<15,X,T/binary>>,S) ->
-    run(T,S++[{dfnd,X}]);
-run(<<22,X,W,T/binary>>,S) ->
-    run(T,S++[{locm,X,W}]);
+run(<<15,T/binary>>,S) ->
+    {X,T2} = eleb128:unsigned_decode(T),
+    run(T2,S++[{dfnd,X}]);
+run(<<22,T/binary>>,S) ->
+    {X,T2} = eleb128:unsigned_decode(T),
+    {W,T3} = eleb128:unsigned_decode(T2),
+    run(T3,S++[{locm,X,W}]);
 run(<<11,T/binary>>,S) ->
     run(T,S++[{setn}]);
 run(<<14,T/binary>>,S) ->
     run(T,S++[{pops}]);
-run(<<0,X,T/binary>>,S) ->
-    run(T,S++[{push,X}]);
+run(<<0,T/binary>>,S) ->
+    {X,T2} = eleb128:unsigned_decode(T),
+    run(T2,S++[{push,X}]);
 run(<<8,T/binary>>,S) ->
     run(T,S++[{op2d}]);
-run(<<21,X,W,T/binary>>,S) ->
-    run(T,S++[{loco,X,W}]);
-run(<<3,X,T/binary>>,S) ->
-    run(T,S++[{arro,X}]);
+run(<<21,T/binary>>,S) ->
+    {X,T2} = eleb128:unsigned_decode(T),
+    {W,T3} = eleb128:unsigned_decode(T2),
+    run(T3,S++[{loco,X,W}]);
+run(<<3,T/binary>>,S) ->
+    {X,T2} = eleb128:unsigned_decode(T),
+    run(T2,S++[{arro,X}]);
 run(<<19,T/binary>>,S) ->
     run(T,S++[{tr30}]);
 run(<<7,T/binary>>,S) ->
@@ -36,8 +43,9 @@ run(<<16,T/binary>>,S) ->
     run(T,S++[{fn10}]);
 run(<<17,T/binary>>,S) ->
     run(T,S++[{fn20}]);
-run(<<1,X,T/binary>>,S) ->
-    run(T,S++[{varo,X}]);
+run(<<1,T/binary>>,S) ->
+    {X,T2} = eleb128:unsigned_decode(T),
+    run(T2,S++[{varo,X}]);
 run(<<20,T/binary>>,S) ->
     run(T,S++[{op2h}]);
 run(<<25,T/binary>>,S) ->
